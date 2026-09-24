@@ -123,7 +123,33 @@ def ancho_a_largo(paquetes_destino):
     #           ... calcular anio y total ...
     #           for posicion, nombre in enumerate(columnas):
     #               ... saltear el total y los None, y hacer filas.append({...})
-    raise NotImplementedError("TODO 1: implementá ancho_a_largo()")
+    for paquete in paquetes_destino:
+        provincia = paquete["provincia"]
+        columnas = paquete["orden_columnas"]
+        posicion_total = columnas.index(CLAVE_TOTAL)
+
+        for fila_cruda in paquete["data"]:
+            fecha = fila_cruda[0]
+            valores = fila_cruda[1:]
+            anio = extraer_anio(fecha)
+
+            total = valores[posicion_total]
+            if total is not None:
+                total = round(total, 2)
+
+            for posicion, nombre in enumerate(columnas):
+                if nombre == CLAVE_TOTAL:
+                    continue
+                valor = valores[posicion]
+                if valor is None:
+                    continue
+                filas.append({
+                    "anio": anio,
+                    "provincia": provincia,
+                    "destino": nombre,
+                    "valor_musd": round(valor, 2),
+                    "total_provincia_musd": total,
+                })
     # ---------------------------------------------------------------------
 
     logging.info("  ancho_a_largo: %s filas", len(filas))
