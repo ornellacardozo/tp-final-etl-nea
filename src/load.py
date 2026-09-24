@@ -106,7 +106,6 @@ def validar(filas):
 
     Los CRÍTICOS cortan el pipeline lanzando una excepción ("fallar
     temprano y ruidosamente"). La cobertura solo deja una advertencia.
-
     Retorna una lista de dicts con el detalle, para el resumen JSON.
     """
     criticos = [
@@ -182,7 +181,29 @@ def construir_resumen(filas, detalle_checks):
     #   - Para provincias únicas y ordenadas: sorted({f["provincia"] for f in filas})
     #   - Para la fecha: datetime.now().strftime("%Y-%m-%d %H:%M")
     #   - Podés agregar más claves si querés (suma puntos en la rúbrica).
-    raise NotImplementedError("TODO 11: implementá construir_resumen()")
+    valores = [f["valor_musd"] for f in filas]
+    anios = [f["anio"] for f in filas]
+
+    resumen = {
+        "dataset": "Exportaciones del NEA por provincia y país de destino",
+        "fuente": "INDEC, vía API de Series de Tiempo de datos.gob.ar (datasets 357.1 y 350.1)",
+        "unidad": "millones de dólares FOB",
+        "generado": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "filas": len(filas),
+        "columnas": len(COLUMNAS),
+        "periodo": {"desde": min(anios), "hasta": max(anios)},
+        "provincias": sorted({f["provincia"] for f in filas}),
+        "destinos": sorted({f["destino"] for f in filas}),
+        "valor_musd": {
+            "minimo": min(valores),
+            "maximo": max(valores),
+            "promedio": round(sum(valores) / len(valores), 2),
+            "total": round(sum(valores), 2),
+        },
+        "quality_checks": detalle_checks,
+    }
+    # -----------------------------------------------------------------
+    return resumen
     # ---------------------------------------------------------------------
 
 
