@@ -132,7 +132,8 @@ SERIES_RUBRO = {
         "CyE":                 "350.1_MISIONES_CCYE__12",
     },
 }
-
+# Rubro que se usa para calcular pp_participacion_pct.
+RUBRO_PRIMARIOS = "Productos primarios"
 # ----------------------------------------------------------------------
 # MAPEO de país de destino -> región geoeconómica
 # Se usa para crear la columna derivada 'region_destino'.

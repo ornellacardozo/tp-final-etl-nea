@@ -327,7 +327,35 @@ def construir_indice_rubros(paquetes_rubro):
     #   - Para el rubro con mayor valor:  max(dic, key=dic.get)
     #   - El total del año es la suma de los 4 rubros: sum(dic.values())
     #   - Descartá los valores None antes de sumar.
-    raise NotImplementedError("TODO 8a: implementá construir_indice_rubros()")
+    for paquete in paquetes_rubro:
+        provincia = paquete["provincia"]
+        columnas = paquete["orden_columnas"]
+
+        for fila_cruda in paquete["data"]:
+            anio = extraer_anio(fila_cruda[0])
+            valores = fila_cruda[1:]
+
+            rubros = {}
+            for posicion, nombre in enumerate(columnas):
+                valor = valores[posicion]
+                if valor is not None:
+                    rubros[nombre] = valor
+
+            if not rubros:
+                continue
+
+            total = sum(rubros.values())
+            rubro_principal = max(rubros, key=rubros.get)
+            primarios = rubros.get(config.RUBRO_PRIMARIOS)
+            if primarios is None:
+                pp_pct = None
+            else:
+                pp_pct = calcular_participacion(primarios, total)
+
+            indice[(provincia, anio)] = {
+                "rubro_principal": rubro_principal,
+                "pp_participacion_pct": pp_pct,
+            }
     # ---------------------------------------------------------------------
 
     logging.info("  índice de rubros: %s claves (provincia, año)", len(indice))
@@ -345,7 +373,16 @@ def unir_con_rubros(filas, indice_rubros):
     # TODO 8b -------------------------------------------------------------
     # Para cada fila, buscá indice_rubros.get((provincia, anio)) y asigná
     # 'rubro_principal' y 'pp_participacion_pct'. Si no hay match, None.
-    raise NotImplementedError("TODO 8b: implementá unir_con_rubros()")
+    for fila in filas:
+        datos = indice_rubros.get((fila["provincia"], fila["anio"]))
+        if datos is None:
+            fila["rubro_principal"] = None
+            fila["pp_participacion_pct"] = None
+        else:
+            fila["rubro_principal"] = datos["rubro_principal"]
+            fila["pp_participacion_pct"] = datos["pp_participacion_pct"]
+    # -----------------------------------------------------------------
+    return filas
     # ---------------------------------------------------------------------
 
 
