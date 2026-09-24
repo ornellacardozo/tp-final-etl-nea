@@ -229,7 +229,9 @@ def calcular_variacion(actual, anterior):
     Devolvé None si 'anterior' es None o cero. Redondeá a 2 decimales.
     """
     # TODO 5 --------------------------------------------------------------
-    raise NotImplementedError("TODO 5: implementá calcular_variacion()")
+    if anterior is None or anterior == 0:
+        return None
+    return round((actual - anterior) / anterior * 100, 2)
     # ---------------------------------------------------------------------
 
 
@@ -251,7 +253,15 @@ def agregar_variacion_interanual(filas):
     #      y calcular_variacion() ya sabe qué hacer con eso.
     #
     # Usar un dict como índice evita recorrer toda la lista por cada fila.
-    raise NotImplementedError("TODO 6: implementá agregar_variacion_interanual()")
+    indice = {}
+    for fila in filas:
+        clave = (fila["provincia"], fila["destino"], fila["anio"])
+        indice[clave] = fila["valor_musd"]
+
+    for fila in filas:
+        clave_anterior = (fila["provincia"], fila["destino"], fila["anio"] - 1)
+        valor_anterior = indice.get(clave_anterior)
+        fila["var_interanual_pct"] = calcular_variacion(fila["valor_musd"], valor_anterior)
     # ---------------------------------------------------------------------
 
 
