@@ -263,7 +263,7 @@ def agregar_variacion_interanual(filas):
         valor_anterior = indice.get(clave_anterior)
         fila["var_interanual_pct"] = calcular_variacion(fila["valor_musd"], valor_anterior)
     # ---------------------------------------------------------------------
-
+    return filas
 
 # ======================================================================
 # 4) RANKING DE DESTINOS
@@ -287,9 +287,18 @@ def agregar_ranking(filas, top_n=None):
     #      sorted(grupo, key=lambda f: f["valor_musd"], reverse=True)
     #   3. Recorré el grupo ordenado con enumerate(..., start=1) y asigná
     #      'ranking_destino' y 'es_top3' (un booleano: posición <= top_n).
-    raise NotImplementedError("TODO 7: implementá agregar_ranking()")
-    # ---------------------------------------------------------------------
+    grupos = {}
+    for fila in filas:
+        clave = (fila["provincia"], fila["anio"])
+        grupos.setdefault(clave, []).append(fila)
 
+    for grupo in grupos.values():
+        ordenado = sorted(grupo, key=lambda f: f["valor_musd"], reverse=True)
+        for posicion, fila in enumerate(ordenado, start=1):
+            fila["ranking_destino"] = posicion
+            fila["es_top3"] = posicion <= top_n
+    # ---------------------------------------------------------------------
+    return filas
 
 # ======================================================================
 # 5) JOIN CON LOS RUBROS
