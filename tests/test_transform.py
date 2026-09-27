@@ -142,24 +142,36 @@ class TestJoinRubros(unittest.TestCase):
 
 
 # ======================================================================
-# TODO 13 (BONUS) — Escribí vos estos dos tests
+# TODO 13 (BONUS) — Tests propios
 # ======================================================================
 class TestPropios(unittest.TestCase):
-    """Sumá tus propios casos. Ideas:
+    """Dos casos que el resto de la suite no cubre: una entrada vacía y el
+    aislamiento del índice que usa la variación interanual."""
 
-    - ¿Qué pasa si 'paquetes_destino' viene vacío? ancho_a_largo()
-      debería devolver [] y no romper.
-    - ¿El ranking asigna bien cuando hay empate en valor_musd?
-    - ¿calcular_decada() funciona con un año de otra década, como 2010?
-    """
-
-    @unittest.skip("TODO 13: quitá este skip y escribí el test")
     def test_lista_vacia(self):
-        self.fail("Escribí este test")
+        # Si la API falla y no llega ningún paquete, ancho_a_largo() tiene
+        # que devolver una lista vacía en lugar de romper. Avisar de que no
+        # hay datos es trabajo del Load, que ya tiene su check de cantidad.
+        self.assertEqual(transform.ancho_a_largo([]), [])
 
-    @unittest.skip("TODO 13: quitá este skip y escribí el test")
-    def test_a_eleccion(self):
-        self.fail("Escribí este test")
+    def test_variacion_no_mezcla_provincias(self):
+        # Mismo destino, dos provincias: cada serie tiene que compararse
+        # contra su propio año anterior. Si el índice usara solo
+        # (destino, año), Formosa terminaría leyendo los valores de Chaco.
+        filas = [
+            {"provincia": "Chaco", "anio": 2023, "destino": "China", "valor_musd": 100.0},
+            {"provincia": "Chaco", "anio": 2024, "destino": "China", "valor_musd": 150.0},
+            {"provincia": "Formosa", "anio": 2023, "destino": "China", "valor_musd": 10.0},
+            {"provincia": "Formosa", "anio": 2024, "destino": "China", "valor_musd": 5.0},
+        ]
+        transform.agregar_variacion_interanual(filas)
+
+        variacion = {(f["provincia"], f["anio"]): f["var_interanual_pct"] for f in filas}
+        self.assertEqual(variacion[("Chaco", 2024)], 50.0)
+        self.assertEqual(variacion[("Formosa", 2024)], -50.0)
+        # 2023 es el primer año de cada serie: no hay con qué comparar
+        self.assertIsNone(variacion[("Chaco", 2023)])
+        self.assertIsNone(variacion[("Formosa", 2023)])
 
 
 if __name__ == "__main__":

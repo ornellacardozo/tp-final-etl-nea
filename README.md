@@ -80,10 +80,10 @@ Los tests:
 python tests/test_transform.py
 ```
 
-19 tests: 17 en verde y 2 salteados (son los del bonus, todavía sin escribir).
-Cubren cada función del transform con datos de juguete: el pasaje de ancho a
-largo, los casos borde de las divisiones (total cero o nulo), el ranking por
-grupo y el left join.
+19 tests, todos en verde. Cubren cada función del transform con datos de
+juguete: el pasaje de ancho a largo, los casos borde de las divisiones (total
+cero o nulo), el ranking por grupo, el left join, la entrada vacía y el
+aislamiento entre provincias al calcular la variación interanual.
 
 ---
 
